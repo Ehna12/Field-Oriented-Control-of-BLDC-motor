@@ -1,0 +1,85 @@
+# Field-Oriented Control (FOC) of BLDC Motor
+
+## Overview
+
+This project focuses on the design and simulation of a **sensored Field-Oriented Control (FOC) system for a three-phase BLDC/PMSM motor using MATLAB/Simulink**.
+
+The system is designed to achieve precise **torque, speed, and position control** using a cascaded control architecture consisting of PI controllers, Clarke and Park transformations, Inverse Park Transformation, Space Vector PWM (SVPWM), a three-phase inverter, and rotor position feedback.
+
+## Objectives
+
+- Develop a complete FOC-based BLDC/PMSM motor drive in MATLAB/Simulink.
+- Implement closed-loop **torque control**.
+- Implement closed-loop **speed control**.
+- Implement closed-loop **position control**.
+- Regulate the motor's d-axis and q-axis currents independently.
+- Generate inverter switching signals using SVPWM.
+- Incorporate rotor position and speed feedback.
+- Evaluate the motor response under different reference commands and load disturbances.
+
+## Control Architecture
+
+The overall control structure follows a cascaded approach:
+
+```text
+Position Reference (θ*)
+        │
+        ▼
+ Position PI Controller
+        │
+        ▼
+ Speed Reference (ω*)
+        │
+        ▼
+   Speed PI Controller
+        │
+        ▼
+ q-axis Current Reference (Iq*)
+        │
+        ├───────────────┐
+        │               │
+       Iq*             Id* = 0
+        │               │
+        ▼               ▼
+     PI (q)           PI (d)
+        │               │
+       Vq*             Vd*
+        └───────┬───────┘
+                │
+                ▼
+       Inverse Park Transform
+                │
+                ▼
+             Vα, Vβ
+                │
+                ▼
+              SVPWM
+                │
+                ▼
+          PWM Gate Signals
+                │
+                ▼
+       Three-Phase Inverter
+                │
+                ▼
+           BLDC/PMSM Motor
+                │
+        ┌───────┴────────┐
+        │                │
+     Ia, Ib, Ic       Rotor Position
+        │                │
+        ▼                ▼
+     Clarke           Encoder/
+   Transform          QEP Feedback
+        │                │
+        ▼                ▼
+     Iα, Iβ             θe
+        │
+        ▼
+      Park
+    Transform
+        │
+        ▼
+      Id, Iq
+        │
+        └──── Feedback
